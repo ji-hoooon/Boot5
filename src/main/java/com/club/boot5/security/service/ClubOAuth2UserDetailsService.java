@@ -3,6 +3,7 @@ package com.club.boot5.security.service;
 import com.club.boot5.entity.ClubMember;
 import com.club.boot5.entity.ClubMemberRole;
 import com.club.boot5.repository.ClubMemberRepository;
+import com.club.boot5.security.dto.ClubAuthMemberDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.RequestEntity;
@@ -23,6 +24,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Log4j2
 //@Service 어노테이션이 스프링의 빈으로 자동 등록
@@ -74,10 +76,26 @@ public class ClubOAuth2UserDetailsService extends DefaultOAuth2UserService {
         }
         log.info("EMAIL: "+ email);
 
-        //해당 이메일 정보를 이용해 소셜로그인한 정보를 이용해 회원가입처리
-        ClubMember member=saveSocialMember(email);
-        //return super.loadUser(userRequest);
-        return oAuth2User;
+        //먼저 OAuth2User 데이터를 ClubAuthMemberDTO로 전달하기 위한 작업 수행
+
+//        //해당 이메일 정보를 이용해 소셜로그인한 정보를 이용해 회원가입처리
+//        ClubMember member=saveSocialMember(email);
+//        //return super.loadUser(userRequest);
+//        return oAuth2User;
+
+        ClubMember clubMember=saveSocialMember(email);
+        ClubAuthMemberDTO clubAuthMemberDTO = new ClubAuthMemberDTO(
+                clubMember.getEmail(),
+                clubMember.getPassword(),
+                true,
+                clubMember.getRoleSet().stream().map(
+                        role->new SimpleGrantedAuthority("ROLE_"+role.name())
+                ).collect(Collectors.toList()),
+                //oAuth2User의 인증정보를 제공한다.
+                oAuth2User.getAttributes()
+        );
+        clubAuthMemberDTO.setName(clubMember.getName());
+        return clubAuthMemberDTO;
 
         //OAuth2UserRequest 타입의 파라미터와 OAuth2User라는 타입의 리턴타입을 반환하는데
         //기존의 로그인 처리에 사용하던 파라미터와 리턴타입의 불일치 문제 발생
@@ -97,6 +115,7 @@ public class ClubOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
         //없다면 회원 추가 패스워드를 1111 / 이름은 이메일 주소
         ClubMember clubMember = ClubMember.builder()
+                .email(email)
                 .name(email)
                 .password(passwordEncoder.encode("1111"))
                 .fromSocial(true)

@@ -18,9 +18,13 @@ import java.util.Map;
 //DTO 역할 수행 + 스프링 시큐리티에서 인가/인증
 public class ClubAuthMemberDTO extends User implements OAuth2User {
     private String email;
+
     private String name;
     private boolean fromSocial;
+    //소셜로그인의 정보를 가져오기 위한 멤버변수추가
+    private String password;
     private Map<String, Object> attr;
+
 
 
     //소셜 로그인으로 인한 OAuth2User를 ClubAuthMemberDTO로 변환하기 위한 생성자
@@ -49,6 +53,8 @@ public class ClubAuthMemberDTO extends User implements OAuth2User {
         super(username, password, authorities);
 
         this.email=username;
+        //소셜로그인의 인증 정보를 가져오기 위해 추가
+        this.password=password;
         this.fromSocial=fromSocial;
 
     }
