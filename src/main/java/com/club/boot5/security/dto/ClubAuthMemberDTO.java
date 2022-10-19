@@ -6,23 +6,38 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
+import java.util.Map;
 
 @Log4j2
 @Getter
 @Setter
 @ToString
 //DTO 역할 수행 + 스프링 시큐리티에서 인가/인증
-public class ClubAuthMemberDTO extends User {
+public class ClubAuthMemberDTO extends User implements OAuth2User {
     private String email;
     private String name;
     private boolean fromSocial;
+    private Map<String, Object> attr;
 
 
-    //필요한 속성인 소셜로그인 체크 여부 속성을 추가한다.
-    public ClubAuthMemberDTO(String username, String password, boolean fromSocial,Collection<? extends GrantedAuthority> authorities){
+    //소셜 로그인으로 인한 OAuth2User를 ClubAuthMemberDTO로 변환하기 위한 생성자
+    public ClubAuthMemberDTO(String username, String password,
+                             boolean fromSocial, Collection<? extends GrantedAuthority> authorities, Map<String, Object> attr) {
 
+
+        this(username,password,fromSocial,authorities);
+        this.attr=attr;
+    }
+    @Override
+    public Map<String, Object> getAttributes(){
+        return this.attr;
+    }
+    //기존 로그인을 통한 인증을 위한 생성자
+    public ClubAuthMemberDTO(String username, String password,
+                             boolean fromSocial, Collection<? extends GrantedAuthority> authorities) {
         //email -> username
         //name -> name
         //fromSocial -> fromSocial
