@@ -1,4 +1,4 @@
-package com.club.boot5.dto;
+package com.club.boot5.security.dto;
 
 import lombok.Getter;
 import lombok.Setter;

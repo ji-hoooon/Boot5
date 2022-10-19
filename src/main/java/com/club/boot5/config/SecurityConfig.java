@@ -24,20 +24,22 @@ public class SecurityConfig {
 
 
     //인메모리를 통해 인증절차를 수행하는 메서드를 빈으로 등록
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user = User.builder()
-                .username("user1")
-                //.password(passwordEncoder().encode("1111"))
-                .password("$2a$10$wO8xgibV2LVtJScXhtFLtOXkM4jppH9/gjPIsVjsHWFkQ6ukIzw4.")
-                .roles("USER")
-                .build();
-
-        log.info("userDetailsService............................");
-        log.info(user);
-
-        return new InMemoryUserDetailsManager(user);
-    }
+    // : ClubUserDetailsService를 빈으로 등록해, 스프링 시큐리티에서 UserDetailsService로 인식하므로
+    // 임시로 직접 설정한 메서드를 사용하지 않도록 설정
+//    @Bean
+//    public InMemoryUserDetailsManager userDetailsService() {
+//        UserDetails user = User.builder()
+//                .username("user1")
+//                //.password(passwordEncoder().encode("1111"))
+//                .password("$2a$10$wO8xgibV2LVtJScXhtFLtOXkM4jppH9/gjPIsVjsHWFkQ6ukIzw4.")
+//                .roles("USER")
+//                .build();
+//
+//        log.info("userDetailsService............................");
+//        log.info(user);
+//
+//        return new InMemoryUserDetailsManager(user);
+//    }
 
     //시큐리티 필터체인을 반환형으로
     //HttpSecurity 객체인 http의 authorizeHttpRequests 메서드로 인가 절차를 수행하는데,
@@ -57,8 +59,10 @@ public class SecurityConfig {
         http.formLogin();
         //csrf 토큰 비활성화
         http.csrf().disable();
-        //스프링 시큐리티에서 제공하는 로그아웃 처리
-        http.logout();
+//        //스프링 시큐리티에서 제공하는 로그아웃 처리
+//        http.logout();
+        //oauth2 로그인을 위한 메서드 추가
+        http.oauth2Login();
 
         return http.build();
     }

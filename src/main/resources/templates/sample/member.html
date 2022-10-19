@@ -6,7 +6,9 @@
 </head>
 <body>
 <h1>For Member ....................</h1>
-
+<!--sec을 이용해 시큐리티 부분 처리하는데 사용 -->
+<!-- sec:authorize는 인가 관련 정보 추출 및 제어 -->
+<!-- sec:principal는 ClubAuthMemberDTO 내용을 이용-->
 <div sec:authorize="hasRole('USER')">Has USER ROLE</div>
 <div sec:authorize="hasRole('MANAGER')">Has MANAGER ROLE</div>
 <div sec:authorize="hasRole('ADMIN')">Has ADMIN ROLE</div>
